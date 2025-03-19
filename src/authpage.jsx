@@ -96,7 +96,7 @@ export default function Authpage() {
             </div>
             <div className="companyname">
               {activeTab === 'signin' ? 'Welcome back to ' : 'Join '}
-              <span className="compname">{apikey}</span>
+              <span className="compname">Keyper</span>
             </div>
             <div className="compdesc">
               {activeTab === 'signin'
@@ -165,7 +165,7 @@ export default function Authpage() {
                 >
                   Register Yourself
                 </div>
-                <div className="button1" onClick={window.location.href(target)}>
+                <div className="button1">
                   {' '}
                   <img src="/signin.png" alt="" className="signinicon" /> Sign
                   In

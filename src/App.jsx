@@ -7,7 +7,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/target/:target/apikey/:apikey" element={<Authpage />} />
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </Router>
   );
