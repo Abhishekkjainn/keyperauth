@@ -18,9 +18,15 @@ export default function Authpage() {
   };
 
   function redirectToDecodedURI(encodedURI, apikey, token) {
-    const decodedURI = decodeURIComponent(encodedURI);
-    decodedURI = decodedURI + `/authkeyper/checktoken/${apikey}`;
-    window.location.replace(decodedURI); // Permanent redirection
+    let decodedURI = decodeURIComponent(encodedURI);
+
+    // Ensure there's a '/' before appending the path
+    if (!decodedURI.endsWith('/')) {
+      decodedURI += '/';
+    }
+
+    decodedURI += `authkeyper/checktoken/${apikey}`;
+    window.location.replace(decodedURI);
   }
 
   // Handles backspace key
