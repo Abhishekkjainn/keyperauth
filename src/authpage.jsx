@@ -17,8 +17,9 @@ export default function Authpage() {
     if (value && index < 9) inputRefs.current[index + 1].focus(); // Move to next input
   };
 
-  function redirectToDecodedURI(encodedURI) {
+  function redirectToDecodedURI(encodedURI, apikey, token) {
     const decodedURI = decodeURIComponent(encodedURI);
+    decodedURI = decodedURI + `/authkeyper/checktoken/${apikey}`;
     window.location.replace(decodedURI); // Permanent redirection
   }
 
@@ -149,7 +150,7 @@ export default function Authpage() {
               </div>
               <div
                 className="button1"
-                onClick={() => redirectToDecodedURI(target)}
+                onClick={() => redirectToDecodedURI(target, apikey)}
               >
                 <img src="/signin.png" alt="" className="signinicon" /> Sign In
               </div>
