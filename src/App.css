@@ -254,12 +254,104 @@ body {
   align-items: center;
 }
 
+.loader-container{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/*Error*/
+/* Centering the error page */
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #090B12;
+}
+
+/* Error box styling */
+.error-box {
+  text-align: center;
+  background: #0e111c;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+}
+
+/* Lottie animation size */
+.error-animation {
+  width: 250px;
+  height: 250px;
+  margin: 0 auto;
+}
+
+/* Title styling */
+.error-title {
+  font-size: 22px;
+  color: #344256;
+  margin-bottom: 10px;
+}
+
+/* Message styling */
+.error-message {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* Buttons styling */
+.error-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.error-btn {
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+/* Go Back Button */
+.back-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Retry Button */
+.retry-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.retry-btn:hover {
+  background-color: #0056b3;
+}
+
+
 
 @media (max-width: 1000px){
+  .authentication{
+    display: flex;
+    justify-content: center;
+    align-items: start;
+  }
   .authdiv {
     width: 100%;
-    min-height: 100vh;
-    max-height: max-content;
+    height: calc(100vh);
+    /* max-height: auto; */
     padding-bottom: 20px;
     background-color: #090B12; /* Deep, dark blue */
     border-radius: 0px;
@@ -267,26 +359,39 @@ body {
     justify-content: center;
     align-items: center;
     color: #D1D4E1; /* Soft off-white text for contrast */
-    border: 1px solid rgba(30, 35, 45, 0.7); /* Subtler, darker border */
+    border: 1px solid transparent;
+    padding-top: 40px;
+  }
+  .authform{
+    width: 80%;
+    height: min-content;
+    background-color: transparent;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    margin-bottom: 20px;
+    overflow-y: auto;
+    margin-top: 20px;
   }
   .seperator{
     width: 100%;
     display: flex;
-    justify-content: start;
-    align-items: start;
+    justify-content: center;
+    align-items: center;
     margin-top: 20px;
   }
   .side1{
     width: 60px;
     height: 1px;
-    margin: 8px;
+    margin: 12px;
     background: linear-gradient(135deg, transparent 0%, #292929 100%);
     border-radius: 50px 0 0 50px;
   }
   .side2{
     width: 60px;
     height: 1px;
-    margin: 8px;
+    margin: 12px;
     background: linear-gradient(135deg, #292929 0%, transparent 100%);
     border-radius: 50px 0 0 50px;
   }

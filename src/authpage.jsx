@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import Loader from './loader';
+import ErrorPage from './error';
 
 export default function Authpage() {
   const [activeTab, setActiveTab] = useState('signin'); // Tracks active tab
@@ -7,6 +9,42 @@ export default function Authpage() {
   const inputRefs = useRef([]); // Refs for OTP inputs
   const hiddenInputRef = useRef(null); // Ref for hidden autofill input
   const { target, apikey } = useParams();
+  // const [loading, setLoading] = useState(true); // Loader state
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  //Fetches the api for
+  const fetchApiKeyData = async (apikey) => {
+    console.log(apikey);
+    var API_URL = `https://keyperapi.vercel.app/apikey/${apikey}`;
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch API Key data');
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || 'Invalid API Key');
+      }
+
+      setData(result.data); // Store data in state
+    } catch (error) {
+      setError(error.message); // Store error in state
+    } finally {
+      setLoading(false); // Hide loader after fetching
+    }
+  };
 
   // Handles input change for OTP fields
   const handleChange = (index, value) => {
@@ -62,12 +100,45 @@ export default function Authpage() {
     }
   }, []);
 
+  useEffect(() => {
+    fetchApiKeyData(apikey);
+  }, [apikey]);
+
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader">
+          <Loader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="errordiv">
+        {error ? (
+          <ErrorPage
+            error={error}
+            retryFunction={() => fetchApiKeyData(apikey)}
+          />
+        ) : (
+          <p>Data Loaded Successfully</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="authentication">
       <div className="authdiv">
         <div className="companydetails">
           <div className="logoandswitch">
-            <img src="/logo.png" alt="Company Logo" className="companylogo" />
+            <img
+              src={data.imageurl}
+              alt="Company Logo"
+              className="companylogo"
+            />
             <div className="switchtoregister">
               <div className="switch-container">
                 <button
@@ -91,7 +162,7 @@ export default function Authpage() {
           </div>
           <div className="companyname">
             {activeTab === 'signin' ? 'Welcome back to ' : 'Join '}
-            <span className="compname">Keyper</span>
+            <span className="compname">{data.platformname}</span>
           </div>
           <div className="compdesc">
             {activeTab === 'signin'
