@@ -142,16 +142,19 @@ export default function Authpage() {
     setPassword(password);
   }
 
-  function decideUsername(email, phone) {
-    if (phone[0] != ' ') {
+  const decideUsername = (phone, email) => {
+    if (isValidPhoneNumber(phone)) {
       setUsername(phone);
-    } else {
+    } else if (isValidEmail(email)) {
       setUsername(email);
+    } else {
+      setPasserror('Please enter a valid email or phone number.');
     }
-  }
+  };
 
-  const handleSignIn = async (username, password, target, apikey) => {
+  const handleSignIn = async (phone, email, password, target, apikey) => {
     setLoading(true);
+    decideUsername(phone, email);
     // username = decideUsername(email, phone);
     const apiurl = `https://keyperapi.vercel.app/signin/username/${username}/password/${password}/apikey/${apikey}`;
     const response = await fetch(apiurl, {
@@ -298,7 +301,7 @@ export default function Authpage() {
               <div
                 className="button1"
                 onClick={() => {
-                  handleSignIn(email, password, target, apikey);
+                  handleSignIn(phone, email, password, target, apikey);
                 }}
               >
                 <img src="/signin.png" alt="" className="signinicon" /> Sign In
