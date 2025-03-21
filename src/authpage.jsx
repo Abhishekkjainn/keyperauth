@@ -254,7 +254,6 @@ export default function Authpage() {
           <div className="companyname">
             {activeTab === 'signin' ? 'Welcome back to ' : 'Join '}
             <span className="compname">{data.platformname}</span>
-            <span className="compname">{phone}</span>
           </div>
           <div className="compdesc">
             {activeTab === 'signin'
