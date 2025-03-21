@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from './loader';
 import ErrorPage from './error';
@@ -13,6 +13,11 @@ export default function Authpage() {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [finalphone, setFinalPhone] = useState('');
+  const [passerror, setPasserror] = useState('');
 
   //Fetches the api for
   const fetchApiKeyData = async (apikey) => {
@@ -55,7 +60,7 @@ export default function Authpage() {
     if (value && index < 9) inputRefs.current[index + 1].focus(); // Move to next input
   };
 
-  function redirectToDecodedURI(encodedURI, apikey, token) {
+  function redirectToDecodedURI(encodedURI, token) {
     let decodedURI = decodeURIComponent(encodedURI);
 
     // Ensure there's a '/' before appending the path
@@ -63,7 +68,7 @@ export default function Authpage() {
       decodedURI += '/';
     }
 
-    decodedURI += `authkeyper/checktoken/${apikey}`;
+    decodedURI += `authkeyper/checktoken/${token}/${apikey}`;
     window.location.replace(decodedURI);
   }
 
@@ -129,6 +134,61 @@ export default function Authpage() {
     );
   }
 
+  function handleEmailchange(email) {
+    setEmail(email);
+  }
+
+  function handlePasswordchange(password) {
+    setPassword(password);
+  }
+
+  function decideUsername(email, phone) {
+    if (phone[0] != ' ') {
+      setUsername(phone);
+    } else {
+      setUsername(email);
+    }
+  }
+
+  const handleSignIn = async (username, password, target, apikey) => {
+    setLoading(true);
+    // username = decideUsername(email, phone);
+    const apiurl = `https://keyperapi.vercel.app/signin/username=${username}/password=${password}/apikey=${apikey}`;
+    const response = await fetch(apiurl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    setLoading(false);
+
+    if (!response.ok) {
+      // Handle different error status codes
+      if (response.status === 401) {
+        setPasserror('Authentication failed. Incorrect password.');
+      } else if (response.status === 404) {
+        setPasserror('No user found with the provided username.');
+      } else if (response.status === 400) {
+        setPasserror('Please Check if Email or Phone is Correct.');
+      } else {
+        setPasserror('Something went wrong. Please try again.');
+      }
+      return;
+    }
+
+    const result = await response.json();
+    // if (result.status === 401 || result.status === 404) {
+    //   setPasserror('Invalid Username or Password.');
+    // }
+
+    if (!result.success) {
+      throw new Error(result.message || 'Invalid API Key');
+    }
+
+    const token = result.token;
+    redirectToDecodedURI(target, token);
+  };
+
   return (
     <div className="authentication">
       <div className="authdiv">
@@ -163,6 +223,7 @@ export default function Authpage() {
           <div className="companyname">
             {activeTab === 'signin' ? 'Welcome back to ' : 'Join '}
             <span className="compname">{data.platformname}</span>
+            <span className="compname">{username}</span>
           </div>
           <div className="compdesc">
             {activeTab === 'signin'
@@ -212,6 +273,8 @@ export default function Authpage() {
               name="email"
               placeholder="johndoe@gmail.com"
               autoComplete="email"
+              value={email}
+              onChange={(e) => handleEmailchange(e.target.value)}
             />
             <div className="legend">Enter Password</div>
             <input
@@ -219,15 +282,24 @@ export default function Authpage() {
               className="passwordinput"
               name="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => handlePasswordchange(e.target.value)}
             />
             <div className="forgetpassword">Forgot Password?</div>
+            {passerror == '' ? (
+              <div className="nothing"></div>
+            ) : (
+              <div className="passerror">{passerror}</div>
+            )}
             <div className="buttonsection">
               <div className="button2" onClick={() => setActiveTab('register')}>
                 Register Yourself
               </div>
               <div
                 className="button1"
-                onClick={() => redirectToDecodedURI(target, apikey)}
+                onClick={() => {
+                  handleSignIn(email, password, target, apikey);
+                }}
               >
                 <img src="/signin.png" alt="" className="signinicon" /> Sign In
               </div>

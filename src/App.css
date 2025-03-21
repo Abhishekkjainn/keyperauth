@@ -339,6 +339,16 @@ body {
 .retry-btn:hover {
   background-color: #0056b3;
 }
+.passerror{
+  color: rgb(255, 40, 40);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
 
 
 
