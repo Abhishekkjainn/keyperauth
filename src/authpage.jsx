@@ -153,7 +153,7 @@ export default function Authpage() {
   const handleSignIn = async (username, password, target, apikey) => {
     setLoading(true);
     // username = decideUsername(email, phone);
-    const apiurl = `https://keyperapi.vercel.app/signin/username=${username}/password=${password}/apikey=${apikey}`;
+    const apiurl = `https://keyperapi.vercel.app/signin/username/${username}/password/${password}/apikey/${apikey}`;
     const response = await fetch(apiurl, {
       method: 'GET',
       headers: {
