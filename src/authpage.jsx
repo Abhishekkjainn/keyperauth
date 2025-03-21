@@ -142,11 +142,24 @@ export default function Authpage() {
     setPassword(password);
   }
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validates if the input is a valid phone number
+  const isValidPhoneNumber = (phone) => {
+    const phoneRegex = /^\d{10}$/; // Adjust the regex based on your requirements
+    return phoneRegex.test(phone);
+  };
   const decideUsername = (phone, email) => {
+    var desiredusername = '';
     if (isValidPhoneNumber(phone)) {
       setUsername(phone);
+      desiredusername = phone;
     } else if (isValidEmail(email)) {
       setUsername(email);
+      desiredusername = email;
     } else {
       setPasserror('Please enter a valid email or phone number.');
     }
@@ -154,9 +167,24 @@ export default function Authpage() {
 
   const handleSignIn = async (phone, email, password, target, apikey) => {
     setLoading(true);
-    decideUsername(phone, email);
+
+    var desiredusername = '';
+    if (isValidPhoneNumber(phone)) {
+      setUsername(phone);
+      desiredusername = phone;
+    } else if (isValidEmail(email)) {
+      setUsername(email);
+      desiredusername = email;
+    } else {
+      setPasserror('Please enter a valid email or phone number.');
+    }
+    console.log(desiredusername);
+    if (!desiredusername) {
+      console.log(desiredusername);
+      return; // Exit if username is not set due to invalid input
+    }
     // username = decideUsername(email, phone);
-    const apiurl = `https://keyperapi.vercel.app/signin/username/${username}/password/${password}/apikey/${apikey}`;
+    const apiurl = `https://keyperapi.vercel.app/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
     const response = await fetch(apiurl, {
       method: 'GET',
       headers: {
@@ -226,7 +254,7 @@ export default function Authpage() {
           <div className="companyname">
             {activeTab === 'signin' ? 'Welcome back to ' : 'Join '}
             <span className="compname">{data.platformname}</span>
-            <span className="compname">{username}</span>
+            <span className="compname">{phone}</span>
           </div>
           <div className="compdesc">
             {activeTab === 'signin'
@@ -301,7 +329,8 @@ export default function Authpage() {
               <div
                 className="button1"
                 onClick={() => {
-                  handleSignIn(phone, email, password, target, apikey);
+                  const combinedPhone = phone.join('');
+                  handleSignIn(combinedPhone, email, password, target, apikey);
                 }}
               >
                 <img src="/signin.png" alt="" className="signinicon" /> Sign In
