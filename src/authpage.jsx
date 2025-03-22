@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, use } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from './loader';
 import ErrorPage from './error';
+import { useNavigate } from 'react-router-dom';
 
 export default function Authpage() {
   const [activeTab, setActiveTab] = useState('signin'); // Tracks active tab
@@ -18,6 +19,12 @@ export default function Authpage() {
   const [email, setEmail] = useState('');
   const [finalphone, setFinalPhone] = useState('');
   const [passerror, setPasserror] = useState('');
+
+  const [regusername, setRegusername] = useState('');
+  const [regpass, setRegpass] = useState('');
+  const [regemail, setRegEmail] = useState('');
+
+  const navigate = useNavigate(); // For navigation
 
   //Fetches the api for
   const fetchApiKeyData = async (apikey) => {
@@ -142,6 +149,18 @@ export default function Authpage() {
     setPassword(password);
   }
 
+  function handleregusername(name) {
+    setRegusername(name);
+  }
+
+  function handleregemail(email) {
+    setRegEmail(email);
+  }
+
+  function handleregpassword(password) {
+    setRegpass(password);
+  }
+
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -208,9 +227,6 @@ export default function Authpage() {
     }
 
     const result = await response.json();
-    // if (result.status === 401 || result.status === 404) {
-    //   setPasserror('Invalid Username or Password.');
-    // }
 
     if (!result.success) {
       throw new Error(result.message || 'Invalid API Key');
@@ -218,6 +234,116 @@ export default function Authpage() {
 
     const token = result.token;
     redirectToDecodedURI(target, token);
+  };
+
+  // const handleRegister = async (phone, email, password, username) => {
+  //   setLoading(true);
+  //   if (!isValidPhoneNumber(phone)) {
+  //     setPasserror('Please enter a valid phone number.');
+  //   }
+  //   if (!isValidEmail(email)) {
+  //     setPasserror('Please enter a valid email.');
+  //   }
+  //   const apiurl = `https://keyperapi.vercel.app/register/name/${username}/email/${email}/phone/${phone}/password/${password}`;
+  //   const response = await fetch(apiurl, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+  //   setLoading(false);
+
+  //   if (!response.ok) {
+  //     // Handle different error status codes
+  //     if (response.status === 409) {
+  //       setPasserror('The Provided Email is Already Registered.');
+  //     } else if (response.status === 408) {
+  //       setPasserror('The Provided Phone is Already Registered.');
+  //     } else if (response.status === 500) {
+  //       setPasserror('Internal Server Error, Please Try Again.');
+  //     } else {
+  //       setPasserror('Something went wrong. Please try again.');
+  //     }
+  //     return;
+  //   }
+
+  //   const result = await response.json();
+
+  //   if (!result.success) {
+  //     throw new Error(result.message || 'Invalid API Key');
+  //   }
+  // };
+
+  const handleRegister = async (phone, email, password, name) => {
+    setLoading(true);
+    // console.log('API URL:', apiurl);
+    console.log(
+      'username:',
+      name,
+      'email:',
+      email,
+      'phone:',
+      phone,
+      'password:',
+      password
+    );
+
+    // Validate phone number
+    if (!isValidPhoneNumber(phone)) {
+      setPasserror('Please enter a valid phone number.');
+      setLoading(false);
+      return;
+    }
+
+    // Validate email
+    if (!isValidEmail(email)) {
+      setPasserror('Please enter a valid email.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const apiurl = `https://keyperapi.vercel.app/registeruser/name/${name}/email/${encodeURIComponent(
+        email
+      )}/phone/${phone}/password/${encodeURIComponent(password)}`;
+      const response = await fetch(apiurl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      setLoading(false);
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setPasserror(
+            result.message.includes('Email')
+              ? 'The Provided Email is Already Registered.'
+              : 'The Provided Phone is Already Registered.'
+          );
+        } else if (response.status === 500) {
+          setPasserror('Internal Server Error, Please Try Again.');
+        } else {
+          setPasserror(
+            result.message || 'Something went wrong. Please try again.'
+          );
+        }
+        return;
+      }
+
+      if (!result.success) {
+        setPasserror(result.message || 'Registration failed.');
+        return;
+      }
+
+      // If registration is successful, navigate to home ('/')
+      navigate('/');
+    } catch (error) {
+      setPasserror('Network error. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -347,6 +473,10 @@ export default function Authpage() {
               className="emailinput"
               name="nameinput"
               placeholder="John Doe"
+              onChange={(e) => {
+                handleregusername(e.target.value);
+                console.log('Updated regusername:', e.target.value);
+              }}
             />
             <div className="legend">Enter Your Phone Number</div>
             <div className="phoneinput">
@@ -356,7 +486,10 @@ export default function Authpage() {
                   type="tel"
                   maxLength="1"
                   value={digit}
-                  onChange={(e) => handleChange(index, e.target.value)}
+                  onChange={(e) => {
+                    handleChange(index, e.target.value);
+                    console.log(e.target.value);
+                  }}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   ref={(el) => (inputRefs.current[index] = el)}
                   className="otp-input"
@@ -372,6 +505,11 @@ export default function Authpage() {
               name="email"
               placeholder="johndoe@gmail.com"
               autoComplete="email"
+              onChange={(e) => {
+                // setRegEmail(e.target.value);
+                handleregemail(e.target.value);
+                console.log('Updated regemail:', e.target.value);
+              }}
             />
             <div className="legend">Enter Password</div>
             <input
@@ -379,12 +517,23 @@ export default function Authpage() {
               className="passwordinput"
               name="password"
               autoComplete="new-password"
+              onChange={(e) => {
+                handleregpassword(e.target.value);
+                console.log(e.target.value);
+              }}
             />
             <div className="buttonsection">
               <div className="button2" onClick={() => setActiveTab('signin')}>
                 Sign In
               </div>
-              <div className="button1">
+              <div
+                className="button1"
+                onClick={() => {
+                  const combinedPhone = phone.join('');
+                  console.log(combinedPhone);
+                  handleRegister(combinedPhone, regemail, regpass, regusername);
+                }}
+              >
                 <img src="/signin.png" alt="" className="signinicon" /> Register
               </div>
             </div>
