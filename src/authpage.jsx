@@ -49,10 +49,9 @@ export default function Authpage() {
       if (!result.success) {
         throw new Error(result.message || 'Invalid API Key');
       }
-
       setData(result.data); // Store data in state
     } catch (error) {
-      setError(error.message); // Store error in state
+      setError('Error fetching API Key data'); // Store error in state
     } finally {
       setLoading(false); // Hide loader after fetching
     }
@@ -203,7 +202,7 @@ export default function Authpage() {
       return; // Exit if username is not set due to invalid input
     }
     // username = decideUsername(email, phone);
-    const apiurl = `https://keyperapi.vercel.app/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
+    const apiurl = `http://localhost:6969/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
     const response = await fetch(apiurl, {
       method: 'GET',
       headers: {
@@ -211,6 +210,7 @@ export default function Authpage() {
       },
     });
     setLoading(false);
+    console.log(response);
 
     if (!response.success) {
       // Handle different error status codes
@@ -227,52 +227,16 @@ export default function Authpage() {
     }
 
     const result = await response.json();
+    console.log(result);
 
     if (!result.success) {
       throw new Error(result.message || 'Invalid API Key');
     }
 
     const token = result.token;
+    console.log(token);
     redirectToDecodedURI(target, token);
   };
-
-  // const handleRegister = async (phone, email, password, username) => {
-  //   setLoading(true);
-  //   if (!isValidPhoneNumber(phone)) {
-  //     setPasserror('Please enter a valid phone number.');
-  //   }
-  //   if (!isValidEmail(email)) {
-  //     setPasserror('Please enter a valid email.');
-  //   }
-  //   const apiurl = `https://keyperapi.vercel.app/register/name/${username}/email/${email}/phone/${phone}/password/${password}`;
-  //   const response = await fetch(apiurl, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   });
-  //   setLoading(false);
-
-  //   if (!response.ok) {
-  //     // Handle different error status codes
-  //     if (response.status === 409) {
-  //       setPasserror('The Provided Email is Already Registered.');
-  //     } else if (response.status === 408) {
-  //       setPasserror('The Provided Phone is Already Registered.');
-  //     } else if (response.status === 500) {
-  //       setPasserror('Internal Server Error, Please Try Again.');
-  //     } else {
-  //       setPasserror('Something went wrong. Please try again.');
-  //     }
-  //     return;
-  //   }
-
-  //   const result = await response.json();
-
-  //   if (!result.success) {
-  //     throw new Error(result.message || 'Invalid API Key');
-  //   }
-  // };
 
   const handleRegister = async (phone, email, password, name) => {
     setLoading(true);
@@ -315,6 +279,7 @@ export default function Authpage() {
 
       const result = await response.json();
       setLoading(false);
+      console.log(result);
 
       if (!response.ok) {
         if (response.status === 409) {
@@ -324,7 +289,9 @@ export default function Authpage() {
               : 'The Provided Phone is Already Registered.'
           );
         } else if (response.status === 500) {
-          setPasserror('Internal Server Error, Please Try Again.');
+          setPasserror(
+            `Internal Server Error, Please Try Again. ${result.error}`
+          );
         } else {
           setPasserror(
             result.message || 'Something went wrong. Please try again.'
@@ -339,7 +306,13 @@ export default function Authpage() {
       }
 
       // If registration is successful, navigate to home ('/')
-      setActiveTab('signin');
+      setPasserror('');
+      setLoading(false);
+      setRegEmail('');
+      setRegpass('');
+      setRegusername('');
+      window.location.reload();
+      // setActiveTab('signin');
     } catch (error) {
       setPasserror('Network error. Please try again.');
       setLoading(false);
@@ -455,6 +428,7 @@ export default function Authpage() {
                 className="button1"
                 onClick={() => {
                   const combinedPhone = phone.join('');
+                  console.log(combinedPhone);
                   handleSignIn(combinedPhone, email, password, target, apikey);
                 }}
               >
