@@ -212,7 +212,7 @@ export default function Authpage() {
     });
     setLoading(false);
 
-    if (!response.ok) {
+    if (!response.success) {
       // Handle different error status codes
       if (response.status === 401) {
         setPasserror('Authentication failed. Incorrect password.');
@@ -339,7 +339,7 @@ export default function Authpage() {
       }
 
       // If registration is successful, navigate to home ('/')
-      navigate('/');
+      setActiveTab('signin');
     } catch (error) {
       setPasserror('Network error. Please try again.');
       setLoading(false);
@@ -522,6 +522,7 @@ export default function Authpage() {
                 console.log(e.target.value);
               }}
             />
+            <div className="passerror">{passerror}</div>
             <div className="buttonsection">
               <div className="button2" onClick={() => setActiveTab('signin')}>
                 Sign In
