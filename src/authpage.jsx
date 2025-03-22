@@ -183,10 +183,61 @@ export default function Authpage() {
     }
   };
 
+  // const handleSignIn = async (phone, email, password, target, apikey) => {
+  //   setLoading(true);
+
+  //   var desiredusername = '';
+  //   if (isValidPhoneNumber(phone)) {
+  //     setUsername(phone);
+  //     desiredusername = phone;
+  //   } else if (isValidEmail(email)) {
+  //     setUsername(email);
+  //     desiredusername = email;
+  //   } else {
+  //     setPasserror('Please enter a valid email or phone number.');
+  //   }
+  //   console.log(desiredusername);
+  //   if (!desiredusername) {
+  //     console.log(desiredusername);
+  //     return; // Exit if username is not set due to invalid input
+  //   }
+  //   // username = decideUsername(email, phone);
+  //   const apiurl = `http://localhost:6969/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
+  //   const response = await fetch(apiurl, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+  //   setLoading(false);
+  //   console.log(response);
+
+  //   if (!response.ok) {
+  //     // Handle different error status codes
+  //     if (response.status === 401) {
+  //       setPasserror('Authentication failed. Incorrect password.');
+  //     } else if (response.status === 404) {
+  //       setPasserror('No user found with the provided username.');
+  //     } else if (response.status === 400) {
+  //       setPasserror('Please Check if Email or Phone is Correct.');
+  //     } else {
+  //       setPasserror('Something went wrong. Please try again.');
+  //     }
+  //     return;
+  //   }
+
+  //   const result = await response.json();
+  //   console.log(result);
+
+  //   const token = result.token;
+  //   console.log(token);
+  //   redirectToDecodedURI(target, token);
+  // };
+
   const handleSignIn = async (phone, email, password, target, apikey) => {
     setLoading(true);
 
-    var desiredusername = '';
+    let desiredusername = '';
     if (isValidPhoneNumber(phone)) {
       setUsername(phone);
       desiredusername = phone;
@@ -195,47 +246,65 @@ export default function Authpage() {
       desiredusername = email;
     } else {
       setPasserror('Please enter a valid email or phone number.');
-    }
-    console.log(desiredusername);
-    if (!desiredusername) {
-      console.log(desiredusername);
-      return; // Exit if username is not set due to invalid input
-    }
-    // username = decideUsername(email, phone);
-    const apiurl = `https://keyperapi.vercel.app/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
-    const response = await fetch(apiurl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    setLoading(false);
-    console.log(response);
-
-    if (!response.success) {
-      // Handle different error status codes
-      if (response.status === 401) {
-        setPasserror('Authentication failed. Incorrect password.');
-      } else if (response.status === 404) {
-        setPasserror('No user found with the provided username.');
-      } else if (response.status === 400) {
-        setPasserror('Please Check if Email or Phone is Correct.');
-      } else {
-        setPasserror('Something went wrong. Please try again.');
-      }
+      setLoading(false);
       return;
     }
 
-    const result = await response.json();
-    console.log(result);
-
-    if (!result.success) {
-      throw new Error(result.message || 'Invalid API Key');
+    console.log('Desired username:', desiredusername);
+    if (!desiredusername) {
+      console.error('No valid username provided.');
+      setLoading(false);
+      return;
     }
 
-    const token = result.token;
-    console.log(token);
-    redirectToDecodedURI(target, token);
+    const apiurl = `http://localhost:6969/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
+    try {
+      const response = await fetch(apiurl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('API Response:', response);
+
+      if (!response.ok) {
+        // Handle different error status codes
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+
+        if (response.status === 401) {
+          setPasserror('Authentication failed. Incorrect password.');
+        } else if (response.status === 404) {
+          setPasserror('No user found with the provided username.');
+        } else if (response.status === 400) {
+          setPasserror('Please check if email or phone is correct.');
+        } else {
+          setPasserror('Something went wrong. Please try again.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      const result = await response.json();
+      console.log('API Result:', result);
+
+      if (!result.success) {
+        setPasserror(result.message || 'Authentication failed.');
+        setLoading(false);
+        return;
+      }
+
+      const token = result.token;
+      console.log('Token received:', token);
+
+      // Redirect using the token
+      redirectToDecodedURI(target, token);
+    } catch (error) {
+      console.error('Network or API error:', error);
+      setPasserror('Network error. Please try again.');
+      setLoading(false);
+    }
   };
 
   const handleRegister = async (phone, email, password, name) => {
