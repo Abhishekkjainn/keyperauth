@@ -202,7 +202,7 @@ export default function Authpage() {
       return; // Exit if username is not set due to invalid input
     }
     // username = decideUsername(email, phone);
-    const apiurl = `http://localhost:6969/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
+    const apiurl = `https://keyperapi.vercel.app/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
     const response = await fetch(apiurl, {
       method: 'GET',
       headers: {
