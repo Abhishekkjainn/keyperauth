@@ -257,7 +257,7 @@ export default function Authpage() {
       return;
     }
 
-    const apiurl = `http://localhost:6969/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
+    const apiurl = `https://keyperapi.vercel.app/signin/username/${desiredusername}/password/${password}/apikey/${apikey}`;
     try {
       const response = await fetch(apiurl, {
         method: 'GET',
